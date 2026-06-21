@@ -14,7 +14,7 @@ const services = [
         <path d="M33 38l2 2 4-4" stroke="#7A2F2F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
-    title: "Consulta Nutricional",
+    title: "Consulta Nutricional Avulsa",
     description:
       "Avaliação completa do seu estado nutricional e comportamento alimentar para criar um plano totalmente personalizado.",
     highlight: "Mais popular",
@@ -27,9 +27,9 @@ const services = [
         <path d="M17 36l-4 4M31 36l4 4" stroke="#7A2F2F" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
-    title: "Emagrecimento Saudável",
+    title: "Acompanhamento Nutricional",
     description:
-      "Protocolo focado em perda de peso sustentável, sem restrições absurdas, com foco em hábitos duradouros.",
+      "Planos de acompanhamento com suporte contínuo via WhatsApp, tirando dúvidas e ajustando conforme sua evolução.",
     highlight: null,
   },
   {
@@ -40,9 +40,9 @@ const services = [
         <path d="M18 22 C20 18, 24 20, 24 24 C24 28, 28 30, 30 26" stroke="#7A2F2F" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
-    title: "Saúde Intestinal",
+    title: "Plano Alimentar Personalizado",
     description:
-      "Tratamento especializado do microbioma intestinal — base da imunidade, bem-estar mental e controle de peso.",
+      "Cardápio adaptado às suas preferências, rotina e objetivos — prático e realista para sua vida.",
     highlight: null,
   },
   {
@@ -52,9 +52,9 @@ const services = [
         <path d="M24 16 L26 22 L32 22 L27 26 L29 32 L24 28 L19 32 L21 26 L16 22 L22 22Z" fill="#F4EBE2" />
       </svg>
     ),
-    title: "Análise de Exames",
+    title: "Emagrecimento Saudável",
     description:
-      "Interpretação dos seus exames laboratoriais sob a ótica nutricional para uma abordagem ainda mais precisa.",
+      "Protocolo focado em perda de peso sustentável, sem restrições absurdas, com foco em hábitos duradouros.",
     highlight: null,
   },
   {
@@ -64,9 +64,9 @@ const services = [
         <path d="M20 22 C20 20, 22 18, 24 18 C26 18, 28 20, 28 22 C28 24, 26 26, 24 26 C22 26, 20 24, 20 22Z" fill="#D2B09F" />
       </svg>
     ),
-    title: "Acompanhamento Contínuo",
+    title: "Saúde Intestinal",
     description:
-      "Suporte mensal com revisões do plano nutricional, tirando dúvidas e ajustando conforme sua evolução.",
+      "Tratamento especializado do microbioma intestinal — base da imunidade, bem-estar mental e controle de peso.",
     highlight: null,
   },
   {
@@ -77,9 +77,9 @@ const services = [
         <path d="M20 28l3 3 6-6" stroke="#7A2F2F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
-    title: "Plano Alimentar Personalizado",
+    title: "Análise Funcional de Exames",
     description:
-      "Cardápio semanal adaptado às suas preferências, rotina e objetivos — prático e realista para sua vida.",
+      "Interpretação dos seus exames laboratoriais sob a ótica da nutrição funcional para uma abordagem ainda mais precisa.",
     highlight: null,
   },
 ];
@@ -137,7 +137,7 @@ export function Services() {
             icon={<ArrowRight size={18} />}
             iconPosition="right"
           >
-            Quero começar minha transformação
+            Quero minha análise funcional
           </Button>
         </div>
       </Container>

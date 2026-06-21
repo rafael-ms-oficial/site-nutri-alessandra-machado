@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Post } from "@/types";
 import { Save, ArrowLeft, Upload } from "lucide-react";
 import Link from "next/link";
 

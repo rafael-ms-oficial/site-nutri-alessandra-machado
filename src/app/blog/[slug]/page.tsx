@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { WhatsAppFloat } from "@/components/layout/WhatsAppFloat";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { WHATSAPP_LINK } from "@/lib/contact";
 import { ArrowLeft, Clock, MessageCircle } from "lucide-react";
 import Link from "next/link";
 
@@ -41,12 +42,8 @@ export default async function BlogPostPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
+  await params;
   const post = samplePost; // TODO: fetch from Supabase by slug
-
-  const whatsappMsg = encodeURIComponent(
-    `Olá Dra. Alessandra! Li o artigo "${post.title}" e gostaria de agendar uma consulta.`
-  );
 
   return (
     <>
@@ -120,7 +117,7 @@ export default async function BlogPostPage({
               Agende uma consulta e receba um plano totalmente personalizado para a sua realidade.
             </p>
             <Button
-              href={`https://wa.me/5500000000000?text=${whatsappMsg}`}
+              href={WHATSAPP_LINK}
               variant="secondary"
               size="lg"
               icon={<MessageCircle size={18} />}

@@ -1,12 +1,9 @@
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { WHATSAPP_LINK } from "@/lib/contact";
 import { MessageCircle } from "lucide-react";
 
 export function CtaFinal() {
-  const whatsappMsg = encodeURIComponent(
-    "Olá Dra. Alessandra! Vim pelo seu site e gostaria de agendar uma consulta."
-  );
-
   return (
     <section
       id="contato"
@@ -39,7 +36,7 @@ export function CtaFinal() {
             className="font-cormorant font-bold text-white leading-tight mb-6"
             style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
           >
-            Sua transformação
+            Sua jornada funcional
             <br />
             começa com uma{" "}
             <span className="italic text-[#D2B09F]">conversa</span>
@@ -52,7 +49,7 @@ export function CtaFinal() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              href={`https://wa.me/5500000000000?text=${whatsappMsg}`}
+              href={WHATSAPP_LINK}
               size="lg"
               variant="secondary"
               icon={<MessageCircle size={20} />}
@@ -68,7 +65,7 @@ export function CtaFinal() {
             {[
               { icon: "🔒", text: "Atendimento sigiloso" },
               { icon: "💚", text: "Sem dietas restritivas" },
-              { icon: "🌍", text: "Online para todo o Brasil" },
+              { icon: "🌍", text: "Online para todo o mundo" },
               { icon: "⭐", text: "98% de satisfação" },
             ].map((item) => (
               <div key={item.text} className="flex items-center gap-2">

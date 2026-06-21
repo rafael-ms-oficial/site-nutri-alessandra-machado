@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
+import { CRN_LABEL, INSTAGRAM_HANDLE, INSTAGRAM_URL, WHATSAPP_LINK } from "@/lib/contact";
 import { MessageCircle } from "lucide-react";
-
-const whatsappMsg = encodeURIComponent("Olá Dra. Alessandra! Gostaria de mais informações.");
 
 export function Footer() {
   return (
@@ -34,7 +33,7 @@ export function Footer() {
                 { label: "Sobre", href: "#sobre" },
                 { label: "Serviços", href: "#servicos" },
                 { label: "Blog", href: "/blog" },
-                { label: "Diagnóstico grátis", href: "#quiz" },
+                { label: "Análise Funcional Gratuita", href: "#quiz" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
@@ -55,7 +54,7 @@ export function Footer() {
             </p>
             <div className="flex flex-col gap-3">
               <a
-                href={`https://wa.me/5500000000000?text=${whatsappMsg}`}
+                href={WHATSAPP_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 font-poppins text-sm text-white/60 hover:text-[#D2B09F] transition-colors"
@@ -64,13 +63,13 @@ export function Footer() {
                 WhatsApp
               </a>
               <a
-                href="https://instagram.com"
+                href={INSTAGRAM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 font-poppins text-sm text-white/60 hover:text-[#D2B09F] transition-colors"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
-                @dra.alessandramachado
+                @{INSTAGRAM_HANDLE}
               </a>
             </div>
           </div>
@@ -81,7 +80,7 @@ export function Footer() {
             © {new Date().getFullYear()} Dra. Alessandra Machado — Nutricionista. Todos os direitos reservados.
           </p>
           <p className="font-poppins text-xs text-white/30">
-            CRN-X · 00000
+            {CRN_LABEL}
           </p>
         </div>
       </Container>

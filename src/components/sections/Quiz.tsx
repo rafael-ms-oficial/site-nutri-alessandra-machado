@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { Button } from "@/components/ui/Button";
+import { WHATSAPP_LINK } from "@/lib/contact";
 import { CheckCircle, ArrowRight, ArrowLeft, MessageCircle } from "lucide-react";
 
 const steps = [
@@ -96,10 +97,6 @@ export function Quiz() {
     setPhase("done");
   }
 
-  const whatsappMsg = encodeURIComponent(
-    `Olá Dra. Alessandra! Me chamo ${lead.name} e acabei de preencher o quiz no seu site. Meu objetivo é: ${answers[0]}. Gostaria de agendar minha consulta!`
-  );
-
   return (
     <SectionWrapper background="pink" id="quiz">
       <Container>
@@ -107,7 +104,7 @@ export function Quiz() {
           {/* Header */}
           <div className="text-center mb-10">
             <span className="font-poppins text-sm font-medium tracking-widest uppercase text-[#D2B09F] block mb-3">
-              Diagnóstico gratuito
+              Análise Funcional Gratuita
             </span>
             <h2
               className="font-cormorant font-bold text-[#7A2F2F]"
@@ -312,7 +309,7 @@ export function Quiz() {
                     <CheckCircle size={40} className="text-[#7A2F2F]" />
                   </div>
                   <h3 className="font-cormorant font-bold text-[#7A2F2F] text-2xl mb-3">
-                    {lead.name}, seu diagnóstico está pronto!
+                    {lead.name}, sua análise funcional está pronta!
                   </h3>
                   <p className="font-poppins text-sm text-[#6B6B6B] leading-relaxed mb-8 max-w-sm mx-auto">
                     Com base nas suas respostas, a Dra. Alessandra pode criar um plano totalmente
@@ -334,7 +331,7 @@ export function Quiz() {
                   </div>
 
                   <Button
-                    href={`https://wa.me/5500000000000?text=${whatsappMsg}`}
+                    href={WHATSAPP_LINK}
                     size="lg"
                     className="w-full justify-center"
                     icon={<MessageCircle size={18} />}

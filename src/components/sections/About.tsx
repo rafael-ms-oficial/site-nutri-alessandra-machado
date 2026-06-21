@@ -1,15 +1,16 @@
 import { Container } from "@/components/ui/Container";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { Button } from "@/components/ui/Button";
+import { CRN_LABEL } from "@/lib/contact";
 import { CheckCircle, ArrowRight } from "lucide-react";
 import Image from "next/image";
 
 const highlights = [
-  "Especialista em comportamento alimentar feminino",
+  "Especializada em Nutrição Clínica Funcional",
   "Abordagem sem dietas restritivas ou proibições",
   "Foco em saúde intestinal e emagrecimento sustentável",
-  "Atendimento online e presencial em todo o Brasil",
-  "Mais de 1.000 pacientes atendidas com sucesso",
+  "Atendimento online e presencial",
+  "Mais de 500 pacientes atendidas com sucesso",
 ];
 
 export function About() {
@@ -46,7 +47,7 @@ export function About() {
 
             {/* Credential badge */}
             <div className="absolute bottom-4 -right-4 lg:right-0 bg-[#7A2F2F] rounded-2xl shadow-lg px-5 py-4 text-white max-w-xs">
-              <p className="font-poppins text-xs opacity-80 mb-1">CRN-X · 00000</p>
+              <p className="font-poppins text-xs opacity-80 mb-1">{CRN_LABEL}</p>
               <p className="font-cormorant font-bold text-xl leading-tight">
                 Nutricionista
                 <br />
@@ -59,7 +60,7 @@ export function About() {
               className="absolute top-4 -left-4 lg:-left-8 bg-white rounded-2xl shadow-[0_8px_32px_rgba(122,47,47,0.10)] px-4 py-3 animate-float"
             >
               <p className="font-poppins text-xs text-[#6B6B6B]">Experiência</p>
-              <p className="font-cormorant font-bold text-[#7A2F2F] text-xl">8+ anos</p>
+              <p className="font-cormorant font-bold text-[#7A2F2F] text-xl">10+ anos</p>
             </div>
           </div>
 
@@ -78,15 +79,17 @@ export function About() {
             </div>
 
             <p className="font-poppins text-[#6B6B6B] leading-relaxed text-sm lg:text-base">
-              Nutricionista especialista em emagrecimento feminino, saúde intestinal e
-              comportamento alimentar. Minha missão é ajudar mulheres a transformarem sua
-              relação com a comida de forma <strong className="text-[#2A2A2A]">leve, prazerosa e sustentável</strong>.
+              Nutricionista especializada em Nutrição Clínica Funcional, com atendimento focado
+              em saúde da mulher, regulação hormonal, emagrecimento feminino, saúde intestinal e
+              comportamento alimentar.
             </p>
 
             <p className="font-poppins text-[#6B6B6B] leading-relaxed text-sm lg:text-base">
               Acredito que uma alimentação saudável não deve ser sinônimo de sofrimento ou
               privação. Cada mulher merece um plano que respeite sua realidade, suas
-              preferências e seu ritmo de vida.
+              preferências e seu ritmo de vida. <strong className="text-[#2A2A2A]">Minha missão é transformar
+              a vida de mulheres, com mais saúde e comendo de forma prazerosa e consciente,
+              sem a necessidade de fórmulas milagrosas.</strong>
             </p>
 
             <ul className="space-y-3">
@@ -104,7 +107,7 @@ export function About() {
               icon={<ArrowRight size={18} />}
               iconPosition="right"
             >
-              Agendar minha consulta
+              Quero minha análise funcional
             </Button>
           </div>
         </div>

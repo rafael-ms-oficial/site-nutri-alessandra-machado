@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { WHATSAPP_LINK } from "@/lib/contact";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import Image from "next/image";
 
@@ -48,7 +49,7 @@ export function Hero() {
               style={{ animationFillMode: "forwards" }}
             >
               <span className="w-2 h-2 bg-[#7A2F2F] rounded-full animate-pulse" />
-              Nutricionista Especialista em Emagrecimento Feminino
+              Nutricionista com Especialização em Nutrição Clínica Funcional
             </div>
 
             <h1
@@ -76,10 +77,10 @@ export function Hero() {
               style={{ animationFillMode: "forwards" }}
             >
               <Button href="#quiz" size="lg" icon={<ArrowRight size={18} />} iconPosition="right">
-                Quero meu diagnóstico
+                Quero minha análise funcional
               </Button>
               <Button
-                href={`https://wa.me/5500000000000?text=${encodeURIComponent("Olá! Gostaria de agendar uma consulta com a Dra. Alessandra.")}`}
+                href={WHATSAPP_LINK}
                 variant="secondary"
                 size="lg"
                 icon={<MessageCircle size={18} />}
@@ -95,8 +96,8 @@ export function Hero() {
               style={{ animationFillMode: "forwards" }}
             >
               {[
-                { value: "1.000+", label: "Pacientes atendidas" },
-                { value: "8 anos", label: "de experiência" },
+                { value: "500+", label: "Histórias transformadas" },
+                { value: "10 anos", label: "de experiência clínica" },
                 { value: "98%", label: "satisfação" },
               ].map((stat) => (
                 <div key={stat.label} className="flex flex-col">

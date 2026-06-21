@@ -1,15 +1,12 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { Star } from "lucide-react";
 
 const stats = [
-  { value: 1000, suffix: "+", label: "Histórias transformadas" },
-  { value: 8, suffix: " anos", label: "de experiência clínica" },
-  { value: 98, suffix: "%", label: "de satisfação" },
-  { value: 3, suffix: "x", label: "mais resultados duradouros" },
+  { value: "500+", label: "Histórias transformadas" },
+  { value: "10 anos", label: "de experiência clínica" },
+  { value: "98%", label: "de satisfação" },
+  { value: "3x", label: "mais resultados duradouros" },
 ];
 
 const testimonials = [
@@ -30,45 +27,6 @@ const testimonials = [
   },
 ];
 
-function Counter({ target, suffix }: { target: number; suffix: string }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const started = useRef(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started.current) {
-          started.current = true;
-          const duration = 1500;
-          const steps = 60;
-          const increment = target / steps;
-          let current = 0;
-          const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-              setCount(target);
-              clearInterval(timer);
-            } else {
-              setCount(Math.floor(current));
-            }
-          }, duration / steps);
-        }
-      },
-      { threshold: 0.3 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [target]);
-
-  return (
-    <span ref={ref}>
-      {count}
-      {suffix}
-    </span>
-  );
-}
-
 export function SocialProof() {
   return (
     <SectionWrapper background="pink" id="resultados">
@@ -84,7 +42,7 @@ export function SocialProof() {
                 className="font-cormorant font-bold text-[#7A2F2F]"
                 style={{ fontSize: "clamp(2rem, 4vw, 3rem)" }}
               >
-                <Counter target={stat.value} suffix={stat.suffix} />
+                {stat.value}
               </div>
               <p className="font-poppins text-sm text-[#6B6B6B] mt-1 leading-snug">
                 {stat.label}
