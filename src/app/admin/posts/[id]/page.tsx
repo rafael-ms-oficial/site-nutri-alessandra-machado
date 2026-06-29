@@ -55,10 +55,14 @@ export default function PostEditorPage() {
   }, [id, isNew, supabase]);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) router.replace("/admin/login");
+    async function checkUser() {
+      const { data } = await supabase.auth.getUser();
+
+      if (!data.user) router.replace("/admin/login");
       else loadPost();
-    });
+    }
+
+    void checkUser();
   }, [router, supabase.auth, loadPost]);
 
   function handleTitleChange(title: string) {

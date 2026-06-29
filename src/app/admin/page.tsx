@@ -25,14 +25,18 @@ export default function AdminDashboard() {
   }, [supabase]);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) {
+    async function checkUser() {
+      const { data } = await supabase.auth.getUser();
+
+      if (!data.user) {
         router.replace("/admin/login");
       } else {
-        setUser(user);
+        setUser(data.user);
         loadPosts();
       }
-    });
+    }
+
+    void checkUser();
   }, [router, supabase.auth, loadPosts]);
 
   async function togglePublish(post: Post) {
