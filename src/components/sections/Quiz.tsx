@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { Button } from "@/components/ui/Button";
 import { WHATSAPP_LINK } from "@/lib/contact";
+import { createClient } from "@/lib/supabase/client";
 import { CheckCircle, ArrowRight, ArrowLeft, MessageCircle } from "lucide-react";
 
 const steps = [
@@ -93,6 +94,12 @@ export function Quiz() {
   async function handleSubmit() {
     if (!validateLead()) return;
     setPhase("analyzing");
+
+    const supabase = createClient();
+    await supabase
+      .from("leads")
+      .insert({ name: lead.name, phone: lead.phone, email: lead.email || null, answers });
+
     await new Promise((r) => setTimeout(r, 2500));
     setPhase("done");
   }

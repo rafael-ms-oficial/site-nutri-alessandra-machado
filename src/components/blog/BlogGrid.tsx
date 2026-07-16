@@ -3,65 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Clock, Search } from "lucide-react";
+import { Post } from "@/types";
+import { categoryEmoji, estimateReadTime, formatPostDate } from "@/lib/blog";
 
 const categories = ["Todos", "Emagrecimento", "Saúde Intestinal", "Comportamento Alimentar", "Nutrição"];
-
-const allPosts = [
-  {
-    slug: "como-perder-peso-sem-dieta",
-    category: "Emagrecimento",
-    title: "Como perder peso sem seguir dietas restritivas",
-    excerpt: "Descubra como uma abordagem baseada em comportamento alimentar pode ser mais eficaz e duradoura do que qualquer dieta da moda.",
-    readTime: "5 min",
-    date: "20 Abr 2025",
-    emoji: "⚖️",
-  },
-  {
-    slug: "saude-intestinal-imunidade",
-    category: "Saúde Intestinal",
-    title: "A conexão entre saúde intestinal e seu bem-estar geral",
-    excerpt: "O intestino é o segundo cérebro do corpo. Entenda como cuidar do seu microbioma pode transformar sua saúde de dentro para fora.",
-    readTime: "7 min",
-    date: "15 Abr 2025",
-    emoji: "🫀",
-  },
-  {
-    slug: "ansiedade-comida-comportamento",
-    category: "Comportamento Alimentar",
-    title: "Ansiedade e comida: como quebrar o ciclo emocional",
-    excerpt: "Comer por ansiedade é mais comum do que você imagina. Veja as estratégias para reconhecer e tratar esse padrão.",
-    readTime: "6 min",
-    date: "10 Abr 2025",
-    emoji: "🧠",
-  },
-  {
-    slug: "cafe-da-manha-ideal",
-    category: "Nutrição",
-    title: "O café da manhã ideal para quem quer emagrecer",
-    excerpt: "Aprenda a montar um café da manhã nutritivo e saciante que ajuda no controle do peso sem sacrifício.",
-    readTime: "4 min",
-    date: "5 Abr 2025",
-    emoji: "🌅",
-  },
-  {
-    slug: "microbioma-flora-intestinal",
-    category: "Saúde Intestinal",
-    title: "Microbioma intestinal: o que é e por que importa",
-    excerpt: "Conheça os trilhões de microrganismos que habitam seu intestino e como eles influenciam seu peso, humor e imunidade.",
-    readTime: "8 min",
-    date: "1 Abr 2025",
-    emoji: "🌿",
-  },
-  {
-    slug: "comer-sem-culpa",
-    category: "Comportamento Alimentar",
-    title: "Comer sem culpa: como desenvolver uma relação saudável com a comida",
-    excerpt: "A culpa após comer é um dos maiores sabotadores do emagrecimento. Saiba como sair desse ciclo de uma vez por todas.",
-    readTime: "5 min",
-    date: "25 Mar 2025",
-    emoji: "💚",
-  },
-];
 
 const categoryBg: Record<string, string> = {
   Emagrecimento: "bg-[#7A2F2F]/10 text-[#7A2F2F]",
@@ -70,16 +15,16 @@ const categoryBg: Record<string, string> = {
   Nutrição: "bg-[#FAF7F2] border border-[#D2B09F] text-[#D2B09F]",
 };
 
-export function BlogGrid() {
+export function BlogGrid({ posts }: { posts: Post[] }) {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [search, setSearch] = useState("");
 
-  const filtered = allPosts.filter((post) => {
+  const filtered = posts.filter((post) => {
     const matchCat = activeCategory === "Todos" || post.category === activeCategory;
     const matchSearch =
       !search ||
       post.title.toLowerCase().includes(search.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(search.toLowerCase());
+      (post.excerpt || "").toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
 
@@ -135,16 +80,16 @@ export function BlogGrid() {
                   background: "linear-gradient(135deg, #F4EBE2 0%, #D2B09F 100%)",
                 }}
               >
-                <span style={{ fontSize: "4rem" }}>{post.emoji}</span>
+                <span style={{ fontSize: "4rem" }}>{categoryEmoji[post.category || ""] || "🌿"}</span>
               </div>
 
               <div className="p-6 flex flex-col flex-1">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className={`font-poppins text-xs font-medium px-2.5 py-1 rounded-full ${categoryBg[post.category] || "bg-[#F4EBE2] text-[#6B6B6B]"}`}>
+                  <span className={`font-poppins text-xs font-medium px-2.5 py-1 rounded-full ${categoryBg[post.category || ""] || "bg-[#F4EBE2] text-[#6B6B6B]"}`}>
                     {post.category}
                   </span>
                   <span className="flex items-center gap-1 font-poppins text-xs text-[#A0A0A0]">
-                    <Clock size={11} /> {post.readTime}
+                    <Clock size={11} /> {estimateReadTime(post.content)}
                   </span>
                 </div>
 
@@ -157,7 +102,7 @@ export function BlogGrid() {
                 </p>
 
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#F4EBE2]">
-                  <span className="font-poppins text-xs text-[#A0A0A0]">{post.date}</span>
+                  <span className="font-poppins text-xs text-[#A0A0A0]">{formatPostDate(post.created_at)}</span>
                   <span className="flex items-center gap-1 font-poppins text-xs font-medium text-[#7A2F2F] group-hover:gap-2 transition-all">
                     Ler <ArrowRight size={12} />
                   </span>

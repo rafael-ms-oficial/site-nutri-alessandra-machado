@@ -3,13 +3,21 @@ import { Footer } from "@/components/layout/Footer";
 import { WhatsAppFloat } from "@/components/layout/WhatsAppFloat";
 import { Container } from "@/components/ui/Container";
 import { BlogGrid } from "@/components/blog/BlogGrid";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
   title: "Blog | Dra. Alessandra Machado — Nutricionista",
   description: "Dicas, ciência e praticidade para transformar sua relação com a alimentação.",
 };
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const supabase = await createClient();
+  const { data: posts } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("published", true)
+    .order("created_at", { ascending: false });
+
   return (
     <>
       <Navbar />
@@ -46,7 +54,7 @@ export default function BlogPage() {
         </div>
 
         <Container className="mt-12">
-          <BlogGrid />
+          <BlogGrid posts={posts || []} />
         </Container>
       </main>
       <Footer />

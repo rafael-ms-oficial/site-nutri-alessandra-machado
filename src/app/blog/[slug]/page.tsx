@@ -4,46 +4,28 @@ import { WhatsAppFloat } from "@/components/layout/WhatsAppFloat";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { WHATSAPP_LINK } from "@/lib/contact";
+import { createClient } from "@/lib/supabase/server";
+import { estimateReadTime, formatPostDate } from "@/lib/blog";
 import { ArrowLeft, Clock, MessageCircle } from "lucide-react";
 import Link from "next/link";
-
-// Static sample post — in production this fetches from Supabase
-const samplePost = {
-  title: "Como perder peso sem seguir dietas restritivas",
-  category: "Emagrecimento",
-  readTime: "5 min",
-  date: "20 Abr 2025",
-  author: "Dra. Alessandra Machado",
-  emoji: "⚖️",
-  content: `
-    <p>A busca pelo peso ideal muitas vezes leva as pessoas a adotarem dietas cada vez mais restritivas — e cada vez mais insustentáveis. O problema é que esse ciclo de restrição, queda, culpa e nova restrição cria uma relação tóxica com a comida que sabota os resultados a longo prazo.</p>
-
-    <h2>Por que as dietas restritivas falham</h2>
-    <p>Quando você restringe drasticamente a alimentação, o corpo interpreta isso como uma ameaça e ativa mecanismos de sobrevivência: diminui o metabolismo, aumenta a sensação de fome e eleva o desejo por alimentos calóricos. É biologia, não falta de força de vontade.</p>
-
-    <h2>A abordagem comportamental</h2>
-    <p>Em vez de ditar o que você pode ou não pode comer, trabalho com você para entender os gatilhos emocionais que levam a escolhas alimentares menos saudáveis. Quando entendemos o "porquê", fica muito mais fácil fazer escolhas conscientes.</p>
-
-    <h2>Princípios que uso com minhas pacientes</h2>
-    <ul>
-      <li><strong>Comer com atenção plena</strong> — sem tela, saboreando cada mordida</li>
-      <li><strong>Reconhecer fome e saciedade</strong> — o corpo sabe, precisamos aprender a ouvir</li>
-      <li><strong>Sem alimentos proibidos</strong> — a proibição aumenta o desejo</li>
-      <li><strong>Consistência, não perfeição</strong> — uma refeição não define seu resultado</li>
-    </ul>
-
-    <h2>Resultados reais e duradouros</h2>
-    <p>As pacientes que trabalham comigo com essa abordagem não apenas atingem seu peso ideal — elas mantêm os resultados. Porque não é uma dieta que tem prazo de validade, é uma mudança de vida.</p>
-  `,
-};
+import { notFound } from "next/navigation";
 
 export default async function BlogPostPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  await params;
-  const post = samplePost; // TODO: fetch from Supabase by slug
+  const { slug } = await params;
+
+  const supabase = await createClient();
+  const { data: post } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("slug", slug)
+    .eq("published", true)
+    .single();
+
+  if (!post) notFound();
 
   return (
     <>
@@ -67,7 +49,7 @@ export default async function BlogPostPage({
                 {post.category}
               </span>
               <span className="flex items-center gap-1 font-poppins text-xs text-[#A0A0A0]">
-                <Clock size={12} /> {post.readTime}
+                <Clock size={12} /> {estimateReadTime(post.content)}
               </span>
             </div>
 
@@ -87,7 +69,7 @@ export default async function BlogPostPage({
               </div>
               <div>
                 <p className="font-poppins text-sm font-medium text-[#2A2A2A]">{post.author}</p>
-                <p className="font-poppins text-xs text-[#A0A0A0]">{post.date}</p>
+                <p className="font-poppins text-xs text-[#A0A0A0]">{formatPostDate(post.created_at)}</p>
               </div>
             </div>
           </Container>
@@ -102,7 +84,7 @@ export default async function BlogPostPage({
               [&_ul]:space-y-2 [&_ul]:mb-4
               [&_li]:text-[#6B6B6B] [&_li]:text-sm
               [&_strong]:text-[#2A2A2A]"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: post.content || "" }}
           />
 
           {/* CTA after article */}

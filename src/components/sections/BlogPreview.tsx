@@ -3,37 +3,9 @@ import { Container } from "@/components/ui/Container";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { Button } from "@/components/ui/Button";
+import { createClient } from "@/lib/supabase/server";
+import { categoryEmoji, estimateReadTime, formatPostDate } from "@/lib/blog";
 import { ArrowRight, Clock } from "lucide-react";
-
-const mockPosts = [
-  {
-    slug: "como-perder-peso-sem-dieta",
-    category: "Emagrecimento",
-    title: "Como perder peso sem seguir dietas restritivas",
-    excerpt:
-      "Descubra como uma abordagem baseada em comportamento alimentar pode ser mais eficaz e duradoura do que qualquer dieta da moda.",
-    readTime: "5 min",
-    date: "20 Apr 2025",
-  },
-  {
-    slug: "saude-intestinal-imunidade",
-    category: "Saúde Intestinal",
-    title: "A conexão entre saúde intestinal e seu bem-estar geral",
-    excerpt:
-      "O intestino é o segundo cérebro do corpo. Entenda como cuidar do seu microbioma pode transformar sua saúde de dentro para fora.",
-    readTime: "7 min",
-    date: "15 Apr 2025",
-  },
-  {
-    slug: "ansiedade-comida-comportamento",
-    category: "Comportamento Alimentar",
-    title: "Ansiedade e comida: como quebrar o ciclo emocional",
-    excerpt:
-      "Comer por ansiedade é mais comum do que você imagina. Veja as estratégias que uso com minhas pacientes para reconhecer e tratar esse padrão.",
-    readTime: "6 min",
-    date: "10 Apr 2025",
-  },
-];
 
 const categoryColors: Record<string, string> = {
   Emagrecimento: "bg-[#7A2F2F]/10 text-[#7A2F2F]",
@@ -41,7 +13,17 @@ const categoryColors: Record<string, string> = {
   "Comportamento Alimentar": "bg-[#F4EBE2] text-[#6B6B6B]",
 };
 
-export function BlogPreview() {
+export async function BlogPreview() {
+  const supabase = await createClient();
+  const { data: posts } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("published", true)
+    .order("created_at", { ascending: false })
+    .limit(3);
+
+  if (!posts || posts.length === 0) return null;
+
   return (
     <SectionWrapper background="pink" id="blog">
       <Container>
@@ -64,7 +46,7 @@ export function BlogPreview() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {mockPosts.map((post, i) => (
+          {posts.map((post, i) => (
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
@@ -86,7 +68,7 @@ export function BlogPreview() {
                   className="font-cormorant font-bold opacity-20 text-white"
                   style={{ fontSize: "5rem" }}
                 >
-                  {["🌿", "🫀", "🧠"][i]}
+                  {categoryEmoji[post.category || ""] || "🌿"}
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
               </div>
@@ -96,14 +78,14 @@ export function BlogPreview() {
                 <div className="flex items-center gap-2 mb-3">
                   <span
                     className={`font-poppins text-xs font-medium px-2.5 py-1 rounded-full ${
-                      categoryColors[post.category] || "bg-[#F4EBE2] text-[#6B6B6B]"
+                      categoryColors[post.category || ""] || "bg-[#F4EBE2] text-[#6B6B6B]"
                     }`}
                   >
                     {post.category}
                   </span>
                   <span className="flex items-center gap-1 font-poppins text-xs text-[#A0A0A0]">
                     <Clock size={11} />
-                    {post.readTime}
+                    {estimateReadTime(post.content)}
                   </span>
                 </div>
 
@@ -116,7 +98,9 @@ export function BlogPreview() {
                 </p>
 
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#F4EBE2]">
-                  <span className="font-poppins text-xs text-[#A0A0A0]">{post.date}</span>
+                  <span className="font-poppins text-xs text-[#A0A0A0]">
+                    {formatPostDate(post.created_at)}
+                  </span>
                   <span className="flex items-center gap-1 font-poppins text-xs font-medium text-[#7A2F2F] group-hover:gap-2 transition-all">
                     Ler artigo <ArrowRight size={12} />
                   </span>
