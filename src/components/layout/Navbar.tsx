@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
+import { handleHashLinkClick } from "@/lib/scrollToHash";
 
 const links = [
   { label: "Início", href: "/" },
-  { label: "Sobre", href: "#sobre" },
-  { label: "Serviços", href: "#servicos" },
+  { label: "Sobre", href: "/#sobre" },
+  { label: "Serviços", href: "/#servicos" },
   { label: "Blog", href: "/blog" },
-  { label: "Contato", href: "#contato" },
+  { label: "Contato", href: "/#contato" },
 ];
 
 export function Navbar() {
@@ -55,6 +56,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={(e) => handleHashLinkClick(e, link.href)}
                 className="font-poppins text-sm text-[#6B6B6B] hover:text-[#7A2F2F] transition-colors duration-200 whitespace-nowrap relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-[#7A2F2F] after:transition-all hover:after:w-full"
               >
                 {link.label}
@@ -82,7 +84,10 @@ export function Navbar() {
               key={link.href}
               href={link.href}
               className="font-poppins text-base text-[#2A2A2A] hover:text-[#7A2F2F] py-1 transition-colors"
-              onClick={() => setOpen(false)}
+              onClick={(e) => {
+                handleHashLinkClick(e, link.href);
+                setOpen(false);
+              }}
             >
               {link.label}
             </Link>

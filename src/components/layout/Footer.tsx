@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { CRN_LABEL, INSTAGRAM_HANDLE, INSTAGRAM_URL, WHATSAPP_LINK } from "@/lib/contact";
+import { handleHashLinkClick } from "@/lib/scrollToHash";
 import { MessageCircle } from "lucide-react";
 
 export function Footer() {
@@ -30,14 +33,15 @@ export function Footer() {
             <ul className="space-y-2">
               {[
                 { label: "Início", href: "/" },
-                { label: "Sobre", href: "#sobre" },
-                { label: "Serviços", href: "#servicos" },
+                { label: "Sobre", href: "/#sobre" },
+                { label: "Serviços", href: "/#servicos" },
                 { label: "Blog", href: "/blog" },
-                { label: "Análise Funcional Gratuita", href: "#quiz" },
+                { label: "Análise Funcional Gratuita", href: "/#quiz" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
+                    onClick={(e) => handleHashLinkClick(e, link.href)}
                     className="font-poppins text-sm text-white/60 hover:text-[#D2B09F] transition-colors"
                   >
                     {link.label}

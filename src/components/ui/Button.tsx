@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { handleHashLinkClick } from "@/lib/scrollToHash";
 
 type Variant = "primary" | "secondary" | "outline" | "ghost";
 type Size = "sm" | "md" | "lg";
@@ -73,7 +74,7 @@ export function Button({
       );
     }
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} className={classes} onClick={(e) => handleHashLinkClick(e, href)}>
         {content}
       </Link>
     );
