@@ -1,10 +1,27 @@
+"use client";
+
+import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { Button } from "@/components/ui/Button";
+import { handleHashLinkClick } from "@/lib/scrollToHash";
 import { ArrowRight } from "lucide-react";
 
 const services = [
+  {
+    icon: (
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-10 h-10">
+        <circle cx="24" cy="24" r="16" stroke="#7A2F2F" strokeWidth="2" />
+        <path d="M24 14v10l6 4" stroke="#D2B09F" strokeWidth="2" strokeLinecap="round" />
+        <path d="M17 36l-4 4M31 36l4 4" stroke="#7A2F2F" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+    title: "Acompanhamento Nutricional",
+    description:
+      "Planos de acompanhamento com suporte contínuo via WhatsApp, tirando dúvidas e ajustando conforme sua evolução.",
+    highlight: "Mais popular",
+  },
   {
     icon: (
       <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-10 h-10">
@@ -17,19 +34,6 @@ const services = [
     title: "Consulta Nutricional Avulsa",
     description:
       "Avaliação completa do seu estado nutricional e comportamento alimentar para criar um plano totalmente personalizado.",
-    highlight: "Mais popular",
-  },
-  {
-    icon: (
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-10 h-10">
-        <circle cx="24" cy="24" r="16" stroke="#7A2F2F" strokeWidth="2" />
-        <path d="M24 14v10l6 4" stroke="#D2B09F" strokeWidth="2" strokeLinecap="round" />
-        <path d="M17 36l-4 4M31 36l4 4" stroke="#7A2F2F" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-    title: "Acompanhamento Nutricional",
-    description:
-      "Planos de acompanhamento com suporte contínuo via WhatsApp, tirando dúvidas e ajustando conforme sua evolução.",
     highlight: null,
   },
   {
@@ -96,11 +100,11 @@ export function Services() {
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service, i) => (
+          {services.map((service) => (
             <div
               key={service.title}
               className={`relative bg-white rounded-3xl p-6 shadow-[0_4px_24px_rgba(122,47,47,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_48px_rgba(122,47,47,0.14)] group ${
-                i === 0 ? "border-2 border-[#7A2F2F]" : "border border-[#F4EBE2]"
+                service.highlight ? "border-2 border-[#7A2F2F]" : "border border-[#F4EBE2]"
               }`}
             >
               {service.highlight && (
@@ -123,9 +127,13 @@ export function Services() {
                 {service.description}
               </p>
 
-              <div className="mt-4 flex items-center gap-1 text-[#7A2F2F] text-sm font-poppins font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <Link
+                href="#quiz"
+                onClick={(e) => handleHashLinkClick(e, "#quiz")}
+                className="mt-4 flex items-center gap-1 text-[#7A2F2F] text-sm font-poppins font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              >
                 Saiba mais <ArrowRight size={14} />
-              </div>
+              </Link>
             </div>
           ))}
         </div>

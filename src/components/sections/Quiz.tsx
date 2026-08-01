@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { Button } from "@/components/ui/Button";
-import { WHATSAPP_LINK } from "@/lib/contact";
+import { buildWhatsAppLink } from "@/lib/contact";
 import { createClient } from "@/lib/supabase/client";
 import { CheckCircle, ArrowRight, ArrowLeft, MessageCircle } from "lucide-react";
 
@@ -100,9 +100,19 @@ export function Quiz() {
       .from("leads")
       .insert({ name: lead.name, phone: lead.phone, email: lead.email || null, answers });
 
+    fetch("/api/notify-lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: lead.name, answers }),
+    }).catch(() => {});
+
     await new Promise((r) => setTimeout(r, 2500));
     setPhase("done");
   }
+
+  const whatsappMessage = `Olá, Dra. Alessandra! Sou ${lead.name} e acabei de fazer o quiz no site. Meu perfil:\n${answers
+    .map((a) => `• ${a}`)
+    .join("\n")}\n\nGostaria de saber mais sobre a análise funcional.`;
 
   return (
     <SectionWrapper background="pink" id="quiz">
@@ -338,7 +348,7 @@ export function Quiz() {
                   </div>
 
                   <Button
-                    href={WHATSAPP_LINK}
+                    href={buildWhatsAppLink(whatsappMessage)}
                     size="lg"
                     className="w-full justify-center"
                     icon={<MessageCircle size={18} />}

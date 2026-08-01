@@ -9,6 +9,7 @@ import { estimateReadTime, formatPostDate } from "@/lib/blog";
 import { ArrowLeft, Clock, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import DOMPurify from "isomorphic-dompurify";
 
 export default async function BlogPostPage({
   params,
@@ -84,7 +85,7 @@ export default async function BlogPostPage({
               [&_ul]:space-y-2 [&_ul]:mb-4
               [&_li]:text-[#6B6B6B] [&_li]:text-sm
               [&_strong]:text-[#2A2A2A]"
-            dangerouslySetInnerHTML={{ __html: post.content || "" }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || "") }}
           />
 
           {/* CTA after article */}

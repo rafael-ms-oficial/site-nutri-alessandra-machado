@@ -20,4 +20,5 @@ export interface Lead {
   email: string | null;
   answers: string[] | null;
   source: string;
+  contacted: boolean;
 }

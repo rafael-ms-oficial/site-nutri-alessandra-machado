@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function AdminLoginPage() {
@@ -68,6 +69,13 @@ export default function AdminLoginPage() {
           {error && (
             <p className="font-poppins text-xs text-red-500">{error}</p>
           )}
+
+          <Link
+            href="/admin/forgot-password"
+            className="block text-right font-poppins text-xs text-[#6B6B6B] hover:text-[#7A2F2F] transition-colors"
+          >
+            Esqueci minha senha
+          </Link>
 
           <button
             type="submit"

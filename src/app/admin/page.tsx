@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Post } from "@/types";
-import { Plus, Pencil, Trash2, Eye, EyeOff, LogOut } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, LogOut, Users, Settings } from "lucide-react";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -75,6 +75,18 @@ export default function AdminDashboard() {
           <span className="font-poppins text-sm text-[#6B6B6B]">Admin Panel</span>
         </div>
         <div className="flex items-center gap-4">
+          <Link
+            href="/admin/leads"
+            className="flex items-center gap-1.5 font-poppins text-sm text-[#6B6B6B] hover:text-[#7A2F2F] transition-colors"
+          >
+            <Users size={16} /> Leads
+          </Link>
+          <Link
+            href="/admin/settings"
+            className="flex items-center gap-1.5 font-poppins text-sm text-[#6B6B6B] hover:text-[#7A2F2F] transition-colors"
+          >
+            <Settings size={16} /> Configurações
+          </Link>
           <span className="font-poppins text-xs text-[#6B6B6B]">{user?.email}</span>
           <button
             onClick={handleLogout}

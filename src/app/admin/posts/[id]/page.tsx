@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Save, ArrowLeft, Upload } from "lucide-react";
 import Link from "next/link";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 
 const categories = ["Emagrecimento", "Saúde Intestinal", "Comportamento Alimentar", "Nutrição"];
 
@@ -34,7 +35,9 @@ export default function PostEditorPage() {
     cover_url: "",
   });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
+  const [uploadError, setUploadError] = useState("");
 
   const supabase = createClient();
 
@@ -102,16 +105,54 @@ export default function PostEditorPage() {
     setSaving(false);
   }
 
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const ext = file.name.split(".").pop();
-    const path = `${Date.now()}.${ext}`;
+  async function uploadImage(file: File): Promise<string | null> {
+    setUploading(true);
+    setUploadError("");
+
+    const rawExt = file.name.split(".").pop();
+    const ext = rawExt && /^[a-zA-Z0-9]+$/.test(rawExt) ? rawExt.toLowerCase() : "jpg";
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
     const { error } = await supabase.storage.from("posts").upload(path, file);
-    if (!error) {
-      const { data } = supabase.storage.from("posts").getPublicUrl(path);
-      setForm((f) => ({ ...f, cover_url: data.publicUrl }));
+    setUploading(false);
+
+    if (error) {
+      setUploadError("Erro ao enviar imagem: " + error.message);
+      return null;
     }
+
+    const { data } = supabase.storage.from("posts").getPublicUrl(path);
+    return data.publicUrl;
+  }
+
+  async function handleCoverImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    const previousUrl = form.cover_url;
+    const url = await uploadImage(file);
+    if (!url) return;
+
+    setForm((f) => ({ ...f, cover_url: url }));
+
+    if (previousUrl.includes("/storage/v1/object/public/posts/")) {
+      const oldPath = previousUrl.split("/storage/v1/object/public/posts/")[1];
+      if (oldPath) void supabase.storage.from("posts").remove([oldPath]);
+    }
+  }
+
+  async function handleEditorImageUpload(): Promise<string | null> {
+    return new Promise((resolve) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.onchange = async () => {
+        const file = input.files?.[0];
+        resolve(file ? await uploadImage(file) : null);
+      };
+      input.click();
+    });
   }
 
   return (
@@ -130,11 +171,11 @@ export default function PostEditorPage() {
           )}
           <button
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || uploading}
             className="inline-flex items-center gap-2 bg-[#7A2F2F] text-white font-poppins text-sm font-medium px-5 py-2.5 rounded-full hover:bg-[#5c2020] disabled:opacity-60 transition-colors"
           >
             <Save size={16} />
-            {saving ? "Salvando..." : "Salvar"}
+            {uploading ? "Enviando imagem..." : saving ? "Salvando..." : "Salvar"}
           </button>
         </div>
       </header>
@@ -217,7 +258,7 @@ export default function PostEditorPage() {
           <textarea
             value={form.excerpt}
             onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-            rows={2}
+            rows={4}
             placeholder="Breve descrição para listagens e SEO"
             className="w-full px-4 py-3 rounded-xl border border-[#F4EBE2] bg-white font-poppins text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#7A2F2F]/30 focus:border-[#7A2F2F] transition-all"
           />
@@ -228,6 +269,14 @@ export default function PostEditorPage() {
           <label className="block font-poppins text-sm font-medium text-[#2A2A2A] mb-1.5">
             Imagem de capa
           </label>
+          {form.cover_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={form.cover_url}
+              alt="Prévia da imagem de capa"
+              className="w-full max-h-56 object-cover rounded-xl border border-[#F4EBE2] mb-3"
+            />
+          )}
           <div className="flex gap-3">
             <input
               type="text"
@@ -237,27 +286,31 @@ export default function PostEditorPage() {
               className="flex-1 px-4 py-3 rounded-xl border border-[#F4EBE2] bg-white font-poppins text-sm focus:outline-none focus:ring-2 focus:ring-[#7A2F2F]/30 focus:border-[#7A2F2F] transition-all"
             />
             <label className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-[#F4EBE2] bg-white font-poppins text-sm text-[#6B6B6B] hover:border-[#7A2F2F] cursor-pointer transition-all">
-              <Upload size={16} /> Upload
-              <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+              <Upload size={16} /> {uploading ? "Enviando..." : "Upload"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={uploading}
+                onChange={handleCoverImageUpload}
+              />
             </label>
           </div>
+          {uploadError && (
+            <p className="font-poppins text-xs text-red-500 mt-1.5">{uploadError}</p>
+          )}
         </div>
 
         {/* Content */}
         <div>
           <label className="block font-poppins text-sm font-medium text-[#2A2A2A] mb-1.5">
-            Conteúdo (HTML)
+            Conteúdo
           </label>
-          <textarea
+          <RichTextEditor
             value={form.content}
-            onChange={(e) => setForm({ ...form, content: e.target.value })}
-            rows={16}
-            placeholder="<p>Conteúdo do artigo em HTML...</p>"
-            className="w-full px-4 py-3 rounded-xl border border-[#F4EBE2] bg-white font-poppins text-sm font-mono resize-y focus:outline-none focus:ring-2 focus:ring-[#7A2F2F]/30 focus:border-[#7A2F2F] transition-all"
+            onChange={(html) => setForm((f) => ({ ...f, content: html }))}
+            onRequestImageUpload={handleEditorImageUpload}
           />
-          <p className="font-poppins text-xs text-[#A0A0A0] mt-1.5">
-            Use tags HTML: &lt;p&gt;, &lt;h2&gt;, &lt;h3&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt;
-          </p>
         </div>
       </main>
     </div>

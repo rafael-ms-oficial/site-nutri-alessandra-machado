@@ -36,8 +36,12 @@ create table if not exists leads (
   phone text not null,
   email text,
   answers jsonb,
-  source text default 'quiz'
+  source text default 'quiz',
+  contacted boolean default false
 );
+
+-- If the table already existed before the "contacted" column was added
+alter table leads add column if not exists contacted boolean default false;
 
 alter table leads enable row level security;
 
@@ -50,6 +54,11 @@ create policy "Admins can read leads"
 create policy "Anyone can submit lead"
   on leads for insert
   with check (true);
+
+-- Admins can update leads (e.g. mark as contacted)
+create policy "Admins can update leads"
+  on leads for update
+  using (auth.role() = 'authenticated');
 
 -- Storage bucket for post images
 insert into storage.buckets (id, name, public) values ('posts', 'posts', true)
