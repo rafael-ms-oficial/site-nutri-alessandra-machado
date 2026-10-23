@@ -5,6 +5,14 @@ export const categoryEmoji: Record<string, string> = {
   "Nutrição": "🌅",
 };
 
+export function normalizePostSlug(value: string): string {
+  return value.trim().replace(/^\/?blog\//, "").replace(/^\/+|\/+$/g, "");
+}
+
+export function postHref(slug: string): string {
+  return `/blog/${encodeURIComponent(normalizePostSlug(slug))}`;
+}
+
 export function estimateReadTime(content: string | null): string {
   const words = (content || "")
     .replace(/<[^>]+>/g, " ")

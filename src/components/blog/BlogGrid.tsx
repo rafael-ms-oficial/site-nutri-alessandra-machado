@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Clock, Search } from "lucide-react";
 import { Post } from "@/types";
-import { categoryEmoji, estimateReadTime, formatPostDate } from "@/lib/blog";
+import { categoryEmoji, estimateReadTime, formatPostDate, postHref } from "@/lib/blog";
 
 const categories = ["Todos", "Emagrecimento", "Saúde Intestinal", "Comportamento Alimentar", "Nutrição"];
 
@@ -71,7 +71,7 @@ export function BlogGrid({ posts }: { posts: Post[] }) {
           {filtered.map((post) => (
             <Link
               key={post.slug}
-              href={`/blog/${post.slug}`}
+              href={postHref(post.slug)}
               className="group bg-white rounded-3xl overflow-hidden shadow-[0_4px_24px_rgba(122,47,47,0.08)] hover:shadow-[0_16px_48px_rgba(122,47,47,0.14)] transition-all duration-300 hover:-translate-y-1 flex flex-col"
             >
               <div

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Save, ArrowLeft, Upload } from "lucide-react";
 import Link from "next/link";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { normalizePostSlug } from "@/lib/blog";
 
 const categories = ["Emagrecimento", "Saúde Intestinal", "Comportamento Alimentar", "Nutrição"];
 
@@ -93,14 +94,20 @@ export default function PostEditorPage() {
 
   async function handleSave() {
     if (saving || uploadPending.current || selectingImage || loading || loadError) return;
-    if (!form.title || !form.slug) {
+    const slug = normalizePostSlug(form.slug);
+    if (!form.title || !slug) {
       setMessage("Título e slug são obrigatórios.");
       return;
     }
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+      setMessage("Use apenas letras minúsculas sem acentos, números e hífens no slug.");
+      return;
+    }
+    setForm((current) => ({ ...current, slug }));
     setSaving(true);
     setMessage("");
 
-    const payload = { ...form };
+    const payload = { ...form, slug };
 
     try {
     if (isNew) {

@@ -4,7 +4,7 @@ import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/server";
-import { categoryEmoji, estimateReadTime, formatPostDate } from "@/lib/blog";
+import { categoryEmoji, estimateReadTime, formatPostDate, postHref } from "@/lib/blog";
 import { ArrowRight, Clock } from "lucide-react";
 
 const categoryColors: Record<string, string> = {
@@ -49,7 +49,7 @@ export async function BlogPreview() {
           {posts.map((post, i) => (
             <Link
               key={post.slug}
-              href={`/blog/${post.slug}`}
+              href={postHref(post.slug)}
               className={`group bg-white rounded-3xl overflow-hidden shadow-[0_4px_24px_rgba(122,47,47,0.08)] hover:shadow-[0_16px_48px_rgba(122,47,47,0.14)] transition-all duration-300 hover:-translate-y-1 flex flex-col`}
             >
               {/* Image placeholder */}

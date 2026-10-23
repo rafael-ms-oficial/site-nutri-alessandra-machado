@@ -19,12 +19,16 @@ export default async function BlogPostPage({
   const { slug } = await params;
 
   const supabase = await createClient();
-  const { data: post } = await supabase
+  const { data: posts, error } = await supabase
     .from("posts")
     .select("*")
-    .eq("slug", slug)
-    .eq("published", true)
-    .single();
+    .in("slug", [slug, `/blog/${slug}`, `blog/${slug}`])
+    .eq("published", true);
+
+  if (error) throw new Error("Unable to load blog post", { cause: error });
+
+  // Prefer the canonical slug while supporting articles saved with a path.
+  const post = posts?.find((post) => post.slug === slug) ?? posts?.[0];
 
   if (!post) notFound();
 
