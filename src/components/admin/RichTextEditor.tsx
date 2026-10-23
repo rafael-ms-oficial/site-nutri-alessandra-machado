@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
@@ -19,6 +19,7 @@ interface RichTextEditorProps {
   value: string;
   onChange: (html: string) => void;
   onRequestImageUpload: () => Promise<string | null>;
+  imageUploadDisabled?: boolean;
 }
 
 function ToolbarButton({
@@ -26,17 +27,20 @@ function ToolbarButton({
   active,
   children,
   title,
+  disabled,
 }: {
   onClick: () => void;
   active?: boolean;
   children: React.ReactNode;
   title: string;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       title={title}
       onClick={onClick}
+      disabled={disabled}
       className={`p-2 rounded-lg transition-colors ${
         active ? "bg-[#7A2F2F] text-white" : "text-[#6B6B6B] hover:bg-[#F4EBE2] hover:text-[#7A2F2F]"
       }`}
@@ -46,7 +50,10 @@ function ToolbarButton({
   );
 }
 
-export function RichTextEditor({ value, onChange, onRequestImageUpload }: RichTextEditorProps) {
+export function RichTextEditor({ value, onChange, onRequestImageUpload, imageUploadDisabled }: RichTextEditorProps) {
+  const imageRequestPending = useRef(false);
+  const [addingImage, setAddingImage] = useState(false);
+  const [imageError, setImageError] = useState("");
   const editor = useEditor({
     extensions: [StarterKit, Image],
     content: value,
@@ -69,9 +76,8 @@ export function RichTextEditor({ value, onChange, onRequestImageUpload }: RichTe
 
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value);
+      editor.commands.setContent(value, { emitUpdate: false });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, editor]);
 
   if (!editor) return null;
@@ -83,14 +89,30 @@ export function RichTextEditor({ value, onChange, onRequestImageUpload }: RichTe
   }
 
   async function handleAddImage() {
-    const url = await onRequestImageUpload();
-    if (!url) return;
-    editor!.chain().focus().setImage({ src: url }).run();
+    if (!editor || imageRequestPending.current || imageUploadDisabled) return;
+    imageRequestPending.current = true;
+    setAddingImage(true);
+    setImageError("");
+    // Keep the insertion point stable while the file picker and upload are open.
+    // Insert after the selection, rather than replacing selected article text.
+    const position = editor.state.selection.to;
+    editor.setEditable(false, false);
+    try {
+      const url = await onRequestImageUpload();
+      if (!url || editor.isDestroyed) return;
+      editor.chain().insertContentAt(position, { type: "image", attrs: { src: url } }).run();
+    } catch {
+      setImageError("Não foi possível inserir a imagem. Tente novamente; o texto foi preservado.");
+    } finally {
+      if (!editor.isDestroyed) editor.setEditable(true, false);
+      imageRequestPending.current = false;
+      setAddingImage(false);
+    }
   }
 
   return (
     <div className="rounded-xl border border-[#F4EBE2] bg-white overflow-hidden focus-within:ring-2 focus-within:ring-[#7A2F2F]/30 focus-within:border-[#7A2F2F] transition-all">
-      <div className="flex items-center gap-1 px-2 py-2 border-b border-[#F4EBE2] bg-[#FAF7F2] flex-wrap">
+      <fieldset disabled={addingImage} className="flex items-center gap-1 px-2 py-2 border-b border-[#F4EBE2] bg-[#FAF7F2] flex-wrap">
         <ToolbarButton
           title="Negrito"
           active={editor.isActive("bold")}
@@ -136,10 +158,11 @@ export function RichTextEditor({ value, onChange, onRequestImageUpload }: RichTe
         <ToolbarButton title="Inserir link" onClick={handleAddLink}>
           <LinkIcon size={16} />
         </ToolbarButton>
-        <ToolbarButton title="Inserir imagem" onClick={handleAddImage}>
+        <ToolbarButton title={addingImage ? "Enviando imagem..." : "Inserir imagem"} disabled={imageUploadDisabled || addingImage} onClick={handleAddImage}>
           <ImagePlus size={16} />
         </ToolbarButton>
-      </div>
+      </fieldset>
+      {imageError && <p role="alert" className="px-4 py-2 text-sm text-red-600">{imageError}</p>}
       <EditorContent editor={editor} />
     </div>
   );

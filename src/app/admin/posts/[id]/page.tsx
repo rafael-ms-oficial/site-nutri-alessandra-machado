@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Save, ArrowLeft, Upload } from "lucide-react";
@@ -38,12 +38,21 @@ export default function PostEditorPage() {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [uploadError, setUploadError] = useState("");
+  const uploadPending = useRef(false);
+  const [selectingImage, setSelectingImage] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
   const supabase = createClient();
 
   const loadPost = useCallback(async () => {
-    if (isNew) return;
-    const { data } = await supabase.from("posts").select("*").eq("id", id).single();
+    if (isNew) { setLoading(false); return; }
+    const { data, error } = await supabase.from("posts").select("*").eq("id", id).single();
+    if (error || !data) {
+      setLoadError("Não foi possível carregar o artigo. Recarregue a página antes de editar.");
+      setLoading(false);
+      return;
+    }
     if (data) {
       setForm({
         title: data.title,
@@ -55,14 +64,20 @@ export default function PostEditorPage() {
         cover_url: data.cover_url || "",
       });
     }
+    setLoading(false);
   }, [id, isNew, supabase]);
 
   useEffect(() => {
     async function checkUser() {
+      try {
       const { data } = await supabase.auth.getUser();
 
       if (!data.user) router.replace("/admin/login");
-      else loadPost();
+      else await loadPost();
+      } catch {
+        setLoadError("Não foi possível carregar o artigo. Recarregue a página antes de editar.");
+        setLoading(false);
+      }
     }
 
     void checkUser();
@@ -77,6 +92,7 @@ export default function PostEditorPage() {
   }
 
   async function handleSave() {
+    if (saving || uploadPending.current || selectingImage || loading || loadError) return;
     if (!form.title || !form.slug) {
       setMessage("Título e slug são obrigatórios.");
       return;
@@ -86,6 +102,7 @@ export default function PostEditorPage() {
 
     const payload = { ...form };
 
+    try {
     if (isNew) {
       const { error } = await supabase.from("posts").insert(payload);
       if (error) setMessage("Erro ao criar post: " + error.message);
@@ -102,27 +119,43 @@ export default function PostEditorPage() {
       else setMessage("Salvo com sucesso!");
     }
 
-    setSaving(false);
+    } catch {
+      setMessage("Não foi possível salvar. Sua edição foi mantida; tente novamente.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function uploadImage(file: File): Promise<string | null> {
+    if (uploadPending.current || saving) return null;
+    const extensions: Record<string, string> = {
+      "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif", "image/avif": "avif",
+    };
+    const ext = extensions[file.type];
+    if (!ext || file.size === 0 || file.size > 5 * 1024 * 1024) {
+      setUploadError("Selecione uma imagem JPG, PNG, WebP, GIF ou AVIF de até 5 MB.");
+      return null;
+    }
+    uploadPending.current = true;
     setUploading(true);
     setUploadError("");
 
-    const rawExt = file.name.split(".").pop();
-    const ext = rawExt && /^[a-zA-Z0-9]+$/.test(rawExt) ? rawExt.toLowerCase() : "jpg";
-    const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-
-    const { error } = await supabase.storage.from("posts").upload(path, file);
-    setUploading(false);
-
-    if (error) {
-      setUploadError("Erro ao enviar imagem: " + error.message);
+    try {
+      const path = `${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("posts").upload(path, file, { contentType: file.type });
+      if (error) {
+        setUploadError("Erro ao enviar imagem: " + error.message + ". O artigo foi preservado.");
+        return null;
+      }
+      const { data } = supabase.storage.from("posts").getPublicUrl(path);
+      return data.publicUrl;
+    } catch {
+      setUploadError("Falha de conexão ao enviar a imagem. O artigo foi preservado; tente novamente.");
       return null;
+    } finally {
+      uploadPending.current = false;
+      setUploading(false);
     }
-
-    const { data } = supabase.storage.from("posts").getPublicUrl(path);
-    return data.publicUrl;
   }
 
   async function handleCoverImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -130,29 +163,35 @@ export default function PostEditorPage() {
     e.target.value = "";
     if (!file) return;
 
-    const previousUrl = form.cover_url;
     const url = await uploadImage(file);
     if (!url) return;
 
     setForm((f) => ({ ...f, cover_url: url }));
 
-    if (previousUrl.includes("/storage/v1/object/public/posts/")) {
-      const oldPath = previousUrl.split("/storage/v1/object/public/posts/")[1];
-      if (oldPath) void supabase.storage.from("posts").remove([oldPath]);
-    }
+    // Existing images may still be used by the published post or other articles.
   }
 
   async function handleEditorImageUpload(): Promise<string | null> {
-    return new Promise((resolve) => {
+    setSelectingImage(true);
+    try {
+    return await new Promise<string | null>((resolve) => {
       const input = document.createElement("input");
       input.type = "file";
-      input.accept = "image/*";
+      input.accept = "image/jpeg,image/png,image/webp,image/gif,image/avif";
+      input.oncancel = () => resolve(null);
       input.onchange = async () => {
         const file = input.files?.[0];
         resolve(file ? await uploadImage(file) : null);
       };
       input.click();
     });
+    } finally {
+      setSelectingImage(false);
+    }
+  }
+
+  if (loading || loadError) {
+    return <main className="p-8" role="status">{loadError || "Carregando artigo..."}</main>;
   }
 
   return (
@@ -171,7 +210,7 @@ export default function PostEditorPage() {
           )}
           <button
             onClick={handleSave}
-            disabled={saving || uploading}
+            disabled={saving || uploading || selectingImage}
             className="inline-flex items-center gap-2 bg-[#7A2F2F] text-white font-poppins text-sm font-medium px-5 py-2.5 rounded-full hover:bg-[#5c2020] disabled:opacity-60 transition-colors"
           >
             <Save size={16} />
@@ -289,15 +328,16 @@ export default function PostEditorPage() {
               <Upload size={16} /> {uploading ? "Enviando..." : "Upload"}
               <input
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
                 className="hidden"
-                disabled={uploading}
+                disabled={uploading || saving || selectingImage}
                 onChange={handleCoverImageUpload}
               />
             </label>
           </div>
+          <p className="font-poppins text-xs text-[#6B6B6B] mt-1.5">JPG, PNG, WebP, GIF ou AVIF, até 5 MB. Salve o artigo para publicar a alteração.</p>
           {uploadError && (
-            <p className="font-poppins text-xs text-red-500 mt-1.5">{uploadError}</p>
+            <p role="alert" className="font-poppins text-xs text-red-500 mt-1.5">{uploadError}</p>
           )}
         </div>
 
@@ -307,9 +347,11 @@ export default function PostEditorPage() {
             Conteúdo
           </label>
           <RichTextEditor
+            key={id}
             value={form.content}
             onChange={(html) => setForm((f) => ({ ...f, content: html }))}
             onRequestImageUpload={handleEditorImageUpload}
+            imageUploadDisabled={uploading || saving || selectingImage}
           />
         </div>
       </main>
